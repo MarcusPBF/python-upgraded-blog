@@ -12,6 +12,7 @@ from datetime import date
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+ckeditor = CKEditor(app)
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -31,6 +32,13 @@ class BlogPost(db.Model):
     author: Mapped[str] = mapped_column(String(250), nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
+class PostForm(FlaskForm):
+    title = StringField('Title')
+    sub_title = StringField('Subtitle')
+    author = StringField('Your Name')
+    img_url = StringField('Image URL')
+    body = CKEditorField('Blog Content')
+    submit = SubmitField('Submit Post')
 
 with app.app_context():
     db.create_all()
@@ -58,7 +66,8 @@ def show_post(post_id):
 # TODO: add_new_post() to create a new blog post
 @app.route('/new-post', methods=['GET','POST'])
 def new_post():
-    return render_template("make-post.html")
+    form = PostForm()
+    return render_template("make-post.html", form=form)
 
 # TODO: edit_post() to change an existing blog post
 
