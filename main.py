@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -67,6 +67,20 @@ def show_post(post_id):
 @app.route('/new-post', methods=['GET','POST'])
 def new_post():
     form = PostForm()
+
+    if form.validate_on_submit():
+        new_post = BlogPost(
+            title = request.form['title'],
+            subtitle = request.form['sub_title'],
+            date = date.today().strftime('%B %d, %Y'),
+            body = request.form['body'],
+            author = request.form['author'],
+            img_url = request.form['img_url'],
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('get_all_posts'))
+
     return render_template("make-post.html", form=form)
 
 # TODO: edit_post() to change an existing blog post
